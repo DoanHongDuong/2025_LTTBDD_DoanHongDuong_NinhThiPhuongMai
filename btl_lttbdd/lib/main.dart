@@ -49,6 +49,46 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
     });
   }
 
+  void _editTask(int index) {
+    final TextEditingController editController = TextEditingController(
+      text: _tasks[index]['title'],
+    );
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Chỉnh sửa chi tiết công việc'),
+        content: TextField(
+          controller: editController,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: 'Nhập nội dung...',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              final newText = editController.text.trim();
+              if (newText.isNotEmpty) {
+                setState(() {
+                  _tasks[index]['title'] = newText; // Cập nhật nội dung
+                });
+                Navigator.pop(context); // Đóng hộp thoại
+              }
+            },
+            child: const Text('Lưu', style: TextStyle(color: Colors.indigo)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showAddDialog() {
     showDialog(
       context: context,
@@ -127,6 +167,7 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                     ],
                   ),
                   child: ListTile(
+                    onTap: () => _editTask(index),
                     leading: Checkbox(
                       value: task['done'],
                       activeColor: Colors.indigo,
