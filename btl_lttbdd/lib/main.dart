@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './group.dart';
 
 void main() => runApp(const ToDoApp());
 
@@ -137,6 +138,17 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
           'ToDo-List',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AboutPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: _tasks.isEmpty
           ? const Center(
