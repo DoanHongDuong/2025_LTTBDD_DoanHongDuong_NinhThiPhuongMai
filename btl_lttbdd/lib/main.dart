@@ -42,33 +42,8 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
   final List<Map<String, dynamic>> _tasks = [];
   String _language = 'vi';
 
-  late final ScrollController _scrollController;
-  bool _isFabVisible = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels > 20) {
-        if (_isFabVisible) {
-          setState(() {
-            _isFabVisible = false;
-          });
-        }
-      } else {
-        if (!_isFabVisible) {
-          setState(() {
-            _isFabVisible = true;
-          });
-        }
-      }
-    });
-  }
-
   @override
   void dispose() {
-    _scrollController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -426,7 +401,6 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
               ),
             )
           : ListView(
-              controller: _scrollController,
               padding: const EdgeInsets.all(16),
               children: [
                 if (tasksToDo.isNotEmpty) ...[
@@ -470,20 +444,12 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                 ],
               ],
             ),
-      floatingActionButton: AnimatedSlide(
-        duration: const Duration(milliseconds: 200),
-        offset: _isFabVisible ? Offset.zero : const Offset(0, 2),
-        child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 200),
-          opacity: _isFabVisible ? 1 : 0,
-          child: FloatingActionButton.extended(
-            onPressed: _showAddDialog,
-            icon: const Icon(Icons.add),
-            label: Text(_language == 'vi' ? 'Thêm công việc' : 'Add Task'),
-            backgroundColor: Colors.indigo,
-            foregroundColor: Colors.white,
-          ),
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showAddDialog,
+        icon: const Icon(Icons.add),
+        label: Text(_language == 'vi' ? 'Thêm công việc' : 'Add Task'),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
       ),
     );
   }
