@@ -1,7 +1,9 @@
+import 'package:btl_lttbdd/settings.dart';
 import 'package:flutter/material.dart';
 import './group.dart';
 import 'package:intl/intl.dart';
 import './calendar.dart';
+import './settings.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
@@ -38,6 +40,7 @@ class ToDoHomePage extends StatefulWidget {
 class _ToDoHomePageState extends State<ToDoHomePage> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, dynamic>> _tasks = [];
+  String _language = 'vi';
 
   late final ScrollController _scrollController;
   bool _isFabVisible = true;
@@ -70,6 +73,12 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
     super.dispose();
   }
 
+  void _changeLanguage(String lang) {
+    setState(() {
+      _language = lang;
+    });
+  }
+
   void _addTask(String title, DateTime? deadline) {
     setState(() {
       _tasks.add({'title': title, 'done': false, 'deadline': deadline});
@@ -98,7 +107,7 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Chỉnh sửa công việc'),
+        title: Text(_language == 'vi' ? 'Chỉnh sửa công việc' : 'Edit Task'),
         content: StatefulBuilder(
           builder: (context, setDialogState) {
             return Column(
@@ -107,8 +116,10 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                 TextField(
                   controller: editController,
                   autofocus: true,
-                  decoration: const InputDecoration(
-                    hintText: 'Nhập nội dung...',
+                  decoration: InputDecoration(
+                    hintText: _language == 'vi'
+                        ? 'Nhập nội dung công việc...'
+                        : 'Enter task...',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -118,7 +129,9 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                     Expanded(
                       child: Text(
                         selectedDate == null
-                            ? 'Chưa có deadline'
+                            ? (_language == 'vi'
+                                  ? 'Thêm deadline (không bắt buộc)'
+                                  : 'Add deadline (optional)')
                             : 'Deadline: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}',
                       ),
                     ),
@@ -156,11 +169,17 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                 Navigator.pop(context);
               }
             },
-            child: const Text('Lưu', style: TextStyle(color: Colors.indigo)),
+            child: Text(
+              _language == 'vi' ? 'Lưu' : 'Save',
+              style: TextStyle(color: Colors.indigo),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+            child: Text(
+              _language == 'vi' ? 'Hủy' : 'Cancel',
+              style: TextStyle(color: Colors.grey),
+            ),
           ),
         ],
       ),
@@ -174,7 +193,7 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Thêm công việc'),
+        title: Text(_language == 'vi' ? 'Thêm công việc' : 'Add Task'),
         content: StatefulBuilder(
           builder: (context, setDialogState) {
             return Column(
@@ -183,8 +202,10 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                 TextField(
                   controller: _controller,
                   autofocus: true,
-                  decoration: const InputDecoration(
-                    hintText: 'Nhập nội dung công việc...',
+                  decoration: InputDecoration(
+                    hintText: _language == 'vi'
+                        ? 'Nhập nội dung...'
+                        : 'Enter task...',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -194,7 +215,9 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                     Expanded(
                       child: Text(
                         selectedDate == null
-                            ? 'Thêm deadline (không bắt buộc)'
+                            ? (_language == 'vi'
+                                  ? 'Chưa có deadline'
+                                  : 'No deadline')
                             : 'Deadline: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}',
                       ),
                     ),
@@ -340,8 +363,8 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
       appBar: AppBar(
         elevation: 3,
         centerTitle: true,
-        title: const Text(
-          'ToDo-List',
+        title: Text(
+          _language == 'vi' ? 'Danh sách việc' : 'ToDo-List',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
         actions: [
@@ -365,6 +388,20 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
               );
             },
           ),
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SettingsPage(
+                    currentLanguage: _language,
+                    onLanguageChanged: _changeLanguage,
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.settings),
+          ),
         ],
       ),
       body: _tasks.isEmpty
@@ -378,8 +415,10 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                     color: Colors.grey.shade400,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Chưa có công việc nào.\nNhấn dấu + để thêm!',
+                  Text(
+                    _language == 'vi'
+                        ? 'Chưa có công việc nào.\nNhấn dấu + để thêm!'
+                        : 'No tasks yet.\nTap + to add!',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
@@ -392,7 +431,9 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
               children: [
                 if (tasksToDo.isNotEmpty) ...[
                   Text(
-                    'Cần làm (${tasksToDo.length})',
+                    _language == 'vi'
+                        ? 'Cần làm (${tasksToDo.length})'
+                        : 'To Do (${tasksToDo.length})',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -410,7 +451,9 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                 ],
                 if (tasksDone.isNotEmpty) ...[
                   Text(
-                    'Đã hoàn thành (${tasksDone.length})',
+                    _language == 'vi'
+                        ? 'Đã hoàn thành (${tasksDone.length})'
+                        : 'Done (${tasksDone.length})',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -436,7 +479,7 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
           child: FloatingActionButton.extended(
             onPressed: _showAddDialog,
             icon: const Icon(Icons.add),
-            label: const Text('Thêm việc'),
+            label: Text(_language == 'vi' ? 'Thêm công việc' : 'Add Task'),
             backgroundColor: Colors.indigo,
             foregroundColor: Colors.white,
           ),
