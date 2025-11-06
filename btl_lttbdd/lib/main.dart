@@ -12,26 +12,64 @@ Future<void> main() async {
   runApp(const ToDoApp());
 }
 
-class ToDoApp extends StatelessWidget {
+class ToDoApp extends StatefulWidget {
   const ToDoApp({super.key});
+
+  @override
+  State<ToDoApp> createState() => _ToDoAppState();
+}
+
+class _ToDoAppState extends State<ToDoApp> {
+  ThemeMode _themeMode = ThemeMode.light;
+  double _fontScale = 1.0;
+
+  void _changeTheme(ThemeMode mode) {
+    setState(() {
+      _themeMode = mode;
+    });
+  }
+
+  void _changeFont(double scale) {
+    setState(() {
+      _fontScale = scale;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ToDo-List',
+      themeMode: _themeMode,
       theme: ThemeData(
         colorSchemeSeed: Colors.indigo,
         useMaterial3: true,
         brightness: Brightness.light,
+        textTheme: Theme.of(
+          context,
+        ).textTheme.apply(fontSizeFactor: _fontScale),
       ),
-      home: const ToDoHomePage(),
+      darkTheme: ThemeData(
+        colorSchemeSeed: Colors.indigo,
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        textTheme: Theme.of(
+          context,
+        ).textTheme.apply(fontSizeFactor: _fontScale),
+      ),
+      home: ToDoHomePage(
+        onThemeChanged: _changeTheme,
+        onFontChanged: _changeFont,
+      ), // truyền callback
     );
   }
 }
 
 class ToDoHomePage extends StatefulWidget {
-  const ToDoHomePage({super.key});
+  final Function(ThemeMode)? onThemeChanged;
+  final Function(double)? onFontChanged;
+
+  const ToDoHomePage({super.key, this.onThemeChanged, this.onFontChanged});
 
   @override
   State<ToDoHomePage> createState() => _ToDoHomePageState();
@@ -41,6 +79,24 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, dynamic>> _tasks = [];
   String _language = 'vi';
+  ThemeMode _themeMode = ThemeMode.light;
+  double _fontScale = 1.0;
+
+  void _changeTheme(ThemeMode mode) {
+    setState(() {
+      _themeMode = mode;
+    });
+
+    if (widget.onThemeChanged != null) {
+      widget.onThemeChanged!(mode);
+    }
+  }
+
+  void _changFont(double scale) {
+    setState(() {
+      _fontScale = scale;
+    });
+  }
 
   @override
   void dispose() {
@@ -371,6 +427,15 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                   builder: (context) => SettingsPage(
                     currentLanguage: _language,
                     onLanguageChanged: _changeLanguage,
+                    currentThemeMode: _themeMode,
+                    onThemeChanged: _changeTheme,
+                    currentFontScale: _fontScale,
+                    onFontChanged: (scale) {
+                      _changFont(scale);
+                      if (widget.onFontChanged != null) {
+                        widget.onFontChanged!(scale);
+                      }
+                    },
                   ),
                 ),
               );
