@@ -133,167 +133,202 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
       text: _tasks[index]['title'],
     );
     DateTime? selectedDate = _tasks[index]['deadline'];
+    String? _errorText;
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(_language == 'vi' ? 'Chỉnh sửa công việc' : 'Edit Task'),
-        content: StatefulBuilder(
+      builder: (context) {
+        return StatefulBuilder(
           builder: (context, setDialogState) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: editController,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: _language == 'vi'
-                        ? 'Nhập nội dung công việc...'
-                        : 'Enter task...',
-                    border: OutlineInputBorder(),
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text(
+                _language == 'vi' ? 'Chỉnh sửa công việc' : 'Edit Task',
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: editController,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: _language == 'vi'
+                          ? 'Nhập nội dung công việc...'
+                          : 'Enter task...',
+                      border: OutlineInputBorder(),
+                      errorText: _errorText,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          selectedDate == null
+                              ? (_language == 'vi'
+                                    ? 'Thêm deadline (không bắt buộc)'
+                                    : 'Add deadline (optional)')
+                              : 'Deadline: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}',
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.calendar_month),
+                        onPressed: () async {
+                          final DateTime? picked = await showDatePicker(
+                            context: context,
+                            initialDate: selectedDate ?? DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime(2101),
+                          );
+                          if (picked != null && picked != selectedDate) {
+                            setDialogState(() {
+                              selectedDate = picked;
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    final newText = editController.text.trim();
+
+                    if (newText.isNotEmpty) {
+                      setState(() {
+                        _tasks[index]['title'] = newText;
+                        _tasks[index]['deadline'] = selectedDate;
+                      });
+                      Navigator.pop(context);
+                    } else {
+                      setDialogState(() {
+                        _errorText = _language == 'vi'
+                            ? 'Nội dung không được để trống'
+                            : 'Task content cannot be empty';
+                      });
+                    }
+                  },
+                  child: Text(
+                    _language == 'vi' ? 'Lưu' : 'Save',
+                    style: TextStyle(color: Colors.indigo),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        selectedDate == null
-                            ? (_language == 'vi'
-                                  ? 'Thêm deadline (không bắt buộc)'
-                                  : 'Add deadline (optional)')
-                            : 'Deadline: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}',
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.calendar_month),
-                      onPressed: () async {
-                        final DateTime? picked = await showDatePicker(
-                          context: context,
-                          initialDate: selectedDate ?? DateTime.now(),
-                          firstDate: DateTime(2020),
-                          lastDate: DateTime(2101),
-                        );
-                        if (picked != null && picked != selectedDate) {
-                          setDialogState(() {
-                            selectedDate = picked;
-                          });
-                        }
-                      },
-                    ),
-                  ],
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    _language == 'vi' ? 'Hủy' : 'Cancel',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
               ],
             );
           },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              final newText = editController.text.trim();
-              if (newText.isNotEmpty) {
-                setState(() {
-                  _tasks[index]['title'] = newText;
-                  _tasks[index]['deadline'] = selectedDate;
-                });
-                Navigator.pop(context);
-              }
-            },
-            child: Text(
-              _language == 'vi' ? 'Lưu' : 'Save',
-              style: TextStyle(color: Colors.indigo),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              _language == 'vi' ? 'Hủy' : 'Cancel',
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   void _showAddDialog() {
     DateTime? selectedDate;
+    String? _errorText;
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(_language == 'vi' ? 'Thêm công việc' : 'Add Task'),
-        content: StatefulBuilder(
+      builder: (context) {
+        return StatefulBuilder(
           builder: (context, setDialogState) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _controller,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: _language == 'vi'
-                        ? 'Nhập nội dung...'
-                        : 'Enter task...',
-                    border: OutlineInputBorder(),
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text(_language == 'vi' ? 'Thêm công việc' : 'Add Task'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _controller,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: _language == 'vi'
+                          ? 'Nhập nội dung...'
+                          : 'Enter task...',
+                      border: OutlineInputBorder(),
+                      errorText: _errorText,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          selectedDate == null
+                              ? (_language == 'vi'
+                                    ? 'Chưa có deadline'
+                                    : 'No deadline')
+                              : 'Deadline: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}',
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.calendar_month),
+                        onPressed: () async {
+                          final DateTime? picked = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime(2101),
+                          );
+                          if (picked != null && picked != selectedDate) {
+                            setDialogState(() {
+                              selectedDate = picked;
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    final text = _controller.text.trim();
+                    if (text.isNotEmpty) {
+                      _addTask(text, selectedDate);
+                      _controller.clear();
+                      Navigator.pop(context);
+                    } else {
+                      setDialogState(() {
+                        _errorText = _language == 'vi'
+                            ? 'Nội dung không được để trống'
+                            : 'Please enter a task';
+                      });
+                    }
+                  },
+                  child: const Text(
+                    'Thêm',
+                    style: TextStyle(color: Colors.indigo),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        selectedDate == null
-                            ? (_language == 'vi'
-                                  ? 'Chưa có deadline'
-                                  : 'No deadline')
-                            : 'Deadline: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}',
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.calendar_month),
-                      onPressed: () async {
-                        final DateTime? picked = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2020),
-                          lastDate: DateTime(2101),
-                        );
-                        if (picked != null && picked != selectedDate) {
-                          setDialogState(() {
-                            selectedDate = picked;
-                          });
-                        }
-                      },
-                    ),
-                  ],
+                TextButton(
+                  onPressed: () {
+                    _controller.clear();
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    'Hủy',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
               ],
             );
           },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (_controller.text.trim().isNotEmpty) {
-                _addTask(_controller.text.trim(), selectedDate);
-                _controller.clear();
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Thêm', style: TextStyle(color: Colors.indigo)),
-          ),
-          TextButton(
-            onPressed: () {
-              _controller.clear();
-              Navigator.pop(context);
-            },
-            child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
