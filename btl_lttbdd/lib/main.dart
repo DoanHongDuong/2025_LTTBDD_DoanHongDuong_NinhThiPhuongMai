@@ -159,104 +159,120 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
       text: _tasks[index]['title'],
     );
     DateTime? deadline = _tasks[index]['deadline'];
+    String? _errorText;
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-          title: Text(
-            _language == 'vi' ? 'Chỉnh sửa công việc' : 'Edit Task',
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: controller,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  hintText: _language == 'vi'
-                      ? 'Tên công việc'
-                      : 'Enter task name',
-                  hintStyle: TextStyle(
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                  ),
-                  filled: true,
-                  fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+              title: Text(
+                _language == 'vi' ? 'Chỉnh sửa công việc' : 'Edit Task',
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 10),
-
-              // Ô chọn deadline
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    deadline == null
-                        ? (_language == 'vi'
-                              ? 'Chưa có deadline'
-                              : 'No deadline')
-                        : '${_language == 'vi' ? 'Deadline:' : 'Deadline:'} ${DateFormat('dd/MM/yyyy').format(deadline)}',
+                  TextField(
+                    controller: controller,
                     style: TextStyle(
-                      color: isDark ? Colors.white70 : Colors.black87,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: _language == 'vi'
+                          ? 'Tên công việc'
+                          : 'Enter task name',
+                      hintStyle: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                      filled: true,
+                      fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      errorText: _errorText,
+                      errorStyle: TextStyle(
+                        color: isDark ? Colors.red[300] : Colors.red[700],
+                      ),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: deadline ?? DateTime.now(),
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2100),
-                      );
-                      if (picked != null) {
-                        setState(() {
-                          _tasks[index]['title'] = controller.text.trim();
-                          _tasks[index]['deadline'] = deadline;
-                        });
-                      }
-                    },
-                    child: Text(
-                      _language == 'vi' ? 'Chọn' : 'Select',
-                      style: TextStyle(color: Colors.indigoAccent),
-                    ),
+                  const SizedBox(height: 10),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        deadline == null
+                            ? (_language == 'vi'
+                                  ? 'Chưa có deadline'
+                                  : 'No deadline')
+                            : '${_language == 'vi' ? 'Deadline:' : 'Deadline:'} ${DateFormat('dd/MM/yyyy').format(deadline!)}', // <--- SỬA LỖI (thêm !)
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black87,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: deadline ?? DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime(2100),
+                          );
+                          if (picked != null) {
+                            setDialogState(() {
+                              deadline = picked;
+                            });
+                          }
+                        },
+                        child: Text(
+                          _language == 'vi' ? 'Chọn' : 'Select',
+                          style: TextStyle(color: Colors.indigoAccent),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-          actions: [
-            // Nút hủy
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                _language == 'vi' ? 'Hủy' : 'Cancel',
-                style: TextStyle(color: Colors.redAccent),
-              ),
-            ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    _language == 'vi' ? 'Hủy' : 'Cancel',
+                    style: TextStyle(color: Colors.redAccent),
+                  ),
+                ),
 
-            // Nút lưu
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _tasks[index]['title'] = controller.text.trim();
-                  _tasks[index]['deadline'] = deadline;
-                });
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                _language == 'vi' ? 'Lưu' : 'Save',
-                style: TextStyle(color: Colors.indigoAccent),
-              ),
-            ),
-          ],
+                TextButton(
+                  onPressed: () {
+                    final newText = controller.text.trim();
+                    if (newText.isNotEmpty) {
+                      setState(() {
+                        _tasks[index]['title'] = newText;
+                        _tasks[index]['deadline'] = deadline;
+                      });
+                      Navigator.of(context).pop();
+                    } else {
+                      setDialogState(() {
+                        _errorText = _language == 'vi'
+                            ? 'Nội dung không được để trống'
+                            : 'Task content cannot be empty';
+                      });
+                    }
+                  },
+                  child: Text(
+                    _language == 'vi' ? 'Lưu' : 'Save',
+                    style: TextStyle(color: Colors.indigoAccent),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -399,12 +415,8 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
       margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark
-            ? (task['done']
-                  ? const Color(0xFF2A2A2A) // màu xám nhạt khi done
-                  : const Color(0xFF1E1E1E)) // màu xám đậm cho việc chưa xong
-            : (task['done']
-                  ? Colors.indigo[50]
-                  : Colors.white), // khi sáng giữ nguyên
+            ? (task['done'] ? const Color(0xFF2A2A2A) : const Color(0xFF1E1E1E))
+            : (task['done'] ? Colors.indigo[50] : Colors.white),
         borderRadius: BorderRadius.circular(14),
         border: isOverdue
             ? Border.all(color: Colors.redAccent, width: 1.5)
