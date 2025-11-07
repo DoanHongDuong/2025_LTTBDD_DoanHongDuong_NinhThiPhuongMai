@@ -40,21 +40,56 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cài đặt')),
+      appBar: AppBar(
+        title: Text(
+          _selectedLanguage == 'vi' ? 'Cài đặt' : 'Settings',
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             ListTile(
-              title: const Text('Ngôn ngữ'),
+              title: Text(
+                _selectedLanguage == 'vi' ? 'Ngôn ngữ' : 'Language',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               subtitle: Text(
                 _selectedLanguage == 'vi' ? 'Tiếng Việt' : 'English',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               trailing: DropdownButton<String>(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                dropdownColor: Theme.of(context).colorScheme.surface,
                 value: _selectedLanguage,
-                items: const [
-                  DropdownMenuItem(value: 'vi', child: Text('Tiếng Việt')),
-                  DropdownMenuItem(value: 'en', child: Text('English')),
+                items: [
+                  DropdownMenuItem(
+                    value: 'vi',
+                    child: Text(
+                      'Tiếng Việt',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'en',
+                    child: Text(
+                      'English',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) {
@@ -68,23 +103,55 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const Divider(),
             ListTile(
-              title: const Text('Chủ đề'),
+              title: Text(
+                _selectedLanguage == 'vi' ? 'Chủ đề' : 'Theme',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               subtitle: Text(
                 _selectedTheme == ThemeMode.light
-                    ? 'Sáng'
+                    ? (_selectedLanguage == 'vi' ? 'Sáng' : 'Light')
                     : _selectedTheme == ThemeMode.dark
-                    ? 'Tối'
-                    : 'Tự động',
+                    ? (_selectedLanguage == 'vi' ? 'Tối' : 'Dark')
+                    : (_selectedLanguage == 'vi' ? 'Tự động' : 'System'),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
-
               trailing: DropdownButton(
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                ),
+                dropdownColor: Theme.of(context).colorScheme.surface,
                 value: _selectedTheme,
-                items: const [
-                  DropdownMenuItem(value: ThemeMode.light, child: Text('Sáng')),
-                  DropdownMenuItem(value: ThemeMode.dark, child: Text('Tối')),
+                items: [
+                  DropdownMenuItem(
+                    value: ThemeMode.light,
+                    child: Text(
+                      _selectedLanguage == 'vi' ? 'Sáng' : 'Light',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: ThemeMode.dark,
+                    child: Text(
+                      _selectedLanguage == 'vi' ? 'Tối' : 'Dark',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
                   DropdownMenuItem(
                     value: ThemeMode.system,
-                    child: Text('Tự động'),
+                    child: Text(
+                      _selectedLanguage == 'vi' ? 'Tự động' : 'System',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
                   ),
                 ],
                 onChanged: (mode) {
@@ -99,20 +166,56 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const Divider(),
             ListTile(
-              title: const Text('Kích thước chữ'),
+              title: Text(
+                _selectedLanguage == 'vi' ? 'Kích thước chữ' : 'Font size',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               subtitle: Text(
                 _selectedFontScale == 0.8
-                    ? 'Nhỏ'
+                    ? (_selectedLanguage == 'vi' ? 'Nhỏ' : 'Small')
                     : _selectedFontScale == 1.0
-                    ? 'Vừa'
-                    : 'Lớn',
+                    ? (_selectedLanguage == 'vi' ? 'Vừa' : 'Medium')
+                    : (_selectedLanguage == 'vi' ? 'Lớn' : 'Large'),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               trailing: DropdownButton<double>(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                dropdownColor: Theme.of(context).colorScheme.surface,
                 value: _selectedFontScale,
-                items: const [
-                  DropdownMenuItem(value: 0.8, child: Text('Nhỏ')),
-                  DropdownMenuItem(value: 1.0, child: Text('Vừa')),
-                  DropdownMenuItem(value: 1.2, child: Text('Lớn')),
+                items: [
+                  DropdownMenuItem(
+                    value: 0.8,
+                    child: Text(
+                      _selectedLanguage == 'vi' ? 'Nhỏ' : 'Small',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 1.0,
+                    child: Text(
+                      _selectedLanguage == 'vi' ? 'Vừa' : 'Medium',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 1.2,
+                    child: Text(
+                      _selectedLanguage == 'vi' ? 'Lớn' : 'Large',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) {
