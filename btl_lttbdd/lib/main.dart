@@ -42,21 +42,46 @@ class _ToDoAppState extends State<ToDoApp> {
       title: 'ToDo-List',
       themeMode: _themeMode,
       theme: ThemeData(
-        colorSchemeSeed: Colors.indigo,
         useMaterial3: true,
         brightness: Brightness.light,
+        colorScheme: ColorScheme.light(
+          background: Colors.white,
+          surface: Colors.grey.shade100,
+          primary: Colors.indigo,
+          onSurface: Colors.black,
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          elevation: 2,
+        ),
+        cardColor: Colors.grey.shade100,
         textTheme: Theme.of(
           context,
         ).textTheme.apply(fontSizeFactor: _fontScale),
       ),
+
       darkTheme: ThemeData(
-        colorSchemeSeed: Colors.indigo,
         useMaterial3: true,
         brightness: Brightness.dark,
+        colorScheme: const ColorScheme.dark(
+          background: Colors.black, // nền chính đen hẳn
+          surface: Color(0xFF1E1E1E), // card, appbar xám sáng hơn
+          primary: Colors.indigo, // màu chính
+          secondary: Colors.grey, // màu phụ
+          onSurface: Colors.white, // màu chữ
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1E1E1E), // appbar sáng hơn nền
+          foregroundColor: Colors.white,
+          elevation: 4,
+        ),
+        cardColor: const Color(0xFF1E1E1E),
         textTheme: Theme.of(
           context,
         ).textTheme.apply(fontSizeFactor: _fontScale),
       ),
+
       home: ToDoHomePage(
         onThemeChanged: _changeTheme,
         onFontChanged: _changeFont,
@@ -138,27 +163,40 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
     showDialog(
       context: context,
       builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
               title: Text(
-                _language == 'vi' ? 'Chỉnh sửa công việc' : 'Edit Task',
+                _language == 'vi' ? 'Thêm công việc' : 'Add Task',
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
-                    controller: editController,
+                    controller: _controller,
                     autofocus: true,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                     decoration: InputDecoration(
                       hintText: _language == 'vi'
-                          ? 'Nhập nội dung công việc...'
+                          ? 'Nhập nội dung...'
                           : 'Enter task...',
-                      border: OutlineInputBorder(),
-                      errorText: _errorText,
+                      hintStyle: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey[700],
+                      ),
+                      filled: true,
+                      fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -218,10 +256,16 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    _controller.clear();
+                    Navigator.pop(context);
+                  },
                   child: Text(
                     _language == 'vi' ? 'Hủy' : 'Cancel',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.grey[800],
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -239,27 +283,46 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
     showDialog(
       context: context,
       builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              title: Text(_language == 'vi' ? 'Thêm công việc' : 'Add Task'),
+              title: Text(
+                _language == 'vi' ? 'Thêm công việc' : 'Add Task',
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: _controller,
                     autofocus: true,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                     decoration: InputDecoration(
+                      errorStyle: TextStyle(
+                        color: isDark ? Colors.red[300] : Colors.red[700],
+                      ),
                       hintText: _language == 'vi'
                           ? 'Nhập nội dung...'
                           : 'Enter task...',
-                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey[700],
+                      ),
+                      filled: true,
+                      fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                       errorText: _errorText,
                     ),
                   ),
+
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -270,6 +333,9 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                                     ? 'Chưa có deadline'
                                     : 'No deadline')
                               : 'Deadline: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}',
+                          style: TextStyle(
+                            color: isDark ? Colors.white70 : Colors.black87,
+                          ),
                         ),
                       ),
                       IconButton(
@@ -309,9 +375,9 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                       });
                     }
                   },
-                  child: const Text(
-                    'Thêm',
-                    style: TextStyle(color: Colors.indigo),
+                  child: Text(
+                    _language == 'vi' ? 'Thêm' : 'Add',
+                    style: const TextStyle(color: Colors.indigo),
                   ),
                 ),
                 TextButton(
@@ -319,9 +385,12 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                     _controller.clear();
                     Navigator.pop(context);
                   },
-                  child: const Text(
-                    'Hủy',
-                    style: TextStyle(color: Colors.grey),
+                  child: Text(
+                    _language == 'vi' ? 'Hủy' : 'Cancel',
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.grey[800],
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -343,16 +412,26 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
       curve: Curves.easeInOut,
       margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
-        color: task['done'] ? Colors.indigo[50] : Colors.white,
-        border: isOverdue ? Border.all(color: Colors.red, width: 1.5) : null,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? (task['done']
+                  ? const Color(0xFF2A2A2A) // màu xám nhạt khi done
+                  : const Color(0xFF1E1E1E)) // màu xám đậm cho việc chưa xong
+            : (task['done']
+                  ? Colors.indigo[50]
+                  : Colors.white), // khi sáng giữ nguyên
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        border: isOverdue
+            ? Border.all(color: Colors.redAccent, width: 1.5)
+            : null,
+        boxShadow: Theme.of(context).brightness == Brightness.light
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ]
+            : [],
       ),
       child: ListTile(
         onTap: () => _editTask(index),
@@ -368,7 +447,9 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
             decoration: task['done']
                 ? TextDecoration.lineThrough
                 : TextDecoration.none,
-            color: task['done'] ? Colors.grey : Colors.black,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? (task['done'] ? Colors.grey[400] : Colors.white)
+                : (task['done'] ? Colors.grey : Colors.black),
             fontWeight: task['done'] ? FontWeight.w400 : FontWeight.w500,
           ),
         ),
@@ -378,20 +459,28 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                   Icon(
                     Icons.calendar_today,
                     size: 14,
-                    color: isOverdue ? Colors.red : Colors.grey[600],
+                    color: isOverdue
+                        ? Colors.redAccent
+                        : (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[400]
+                              : Colors.grey[600]),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     DateFormat('dd/MM/yyyy').format(deadline),
                     style: TextStyle(
-                      color: isOverdue ? Colors.red : Colors.grey[600],
+                      color: isOverdue
+                          ? Colors.redAccent
+                          : (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey[400]
+                                : Colors.grey[600]),
                     ),
                   ),
                 ],
               )
             : null,
         trailing: IconButton(
-          icon: const Icon(Icons.delete_outline, color: Colors.red),
+          icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
           onPressed: () => _removeTask(index),
         ),
       ),
@@ -425,7 +514,7 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         elevation: 3,
         centerTitle: true,
@@ -531,9 +620,12 @@ class _ToDoHomePageState extends State<ToDoHomePage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey[700],
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[400]
+                          : Colors.grey[700],
                     ),
                   ),
+
                   const SizedBox(height: 8),
                   ...tasksDone.map((taskData) {
                     return _buildTaskItem(

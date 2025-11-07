@@ -52,7 +52,7 @@ class AboutPage extends StatelessWidget {
               child: Text('A'),
             ),
             title: Text('Ninh Thị Phương Mai'),
-            subtitle: Text('Vai trò: '),
+            subtitle: Text('Vai trò: Thành viên'),
           ),
           const ListTile(
             leading: CircleAvatar(
@@ -61,7 +61,7 @@ class AboutPage extends StatelessWidget {
               child: Text('B'),
             ),
             title: Text('Đoàn Hồng Dương'),
-            subtitle: Text('Vai trò: '),
+            subtitle: Text('Vai trò: Trưởng nhóm'),
           ),
         ],
       ),
